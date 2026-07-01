@@ -69,6 +69,15 @@ function LastUpdatedInfo({ lastUpdated, locale, t }: LastUpdatedInfoProps) {
   );
 }
 
+function formatTokenToYi(value: number): string {
+  const yi = value / 100_000_000;
+  if (yi >= 1) {
+    const raw = yi.toFixed(2).replace(/\.?0+$/, '');
+    return `≈${raw}亿`;
+  }
+  return '';
+}
+
 export function TokenStatsCard() {
   const { t, i18n } = useTranslation();
   const { data: stats, isLoading, error } = useTokenStats();
@@ -77,27 +86,18 @@ export function TokenStatsCard() {
   if (isLoading) {
     return (
       <Card className='min-w-0'>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <Skeleton className='h-4 w-[120px]' />
-          <Skeleton className='h-4 w-4' />
+        <CardHeader className='flex flex-wrap items-start sm:items-center justify-between gap-2 pb-2'>
+          <Skeleton className='h-5 w-[120px]' />
+          <Skeleton className='h-5 w-[200px]' />
         </CardHeader>
         <CardContent>
-          <div className='flex items-end justify-between gap-2 sm:flex-col sm:gap-2 xl:flex-row xl:items-end xl:justify-between'>
-            <div className='text-center w-full sm:min-w-0 sm:flex sm:items-center sm:justify-between xl:block xl:flex-1 xl:text-center'>
-              <Skeleton className='h-4 w-[40px] sm:mb-0 xl:mb-1' />
-              <Skeleton className='h-6 w-[60px]' />
-            </div>
-            <div className='bg-border h-8 w-px shrink-0 sm:hidden xl:block'></div>
-            <div className='bg-border h-px w-full shrink-0 hidden sm:block xl:hidden'></div>
-            <div className='text-center w-full sm:min-w-0 sm:flex sm:items-center sm:justify-between xl:block xl:flex-1 xl:text-center'>
-              <Skeleton className='h-4 w-[40px] sm:mb-0 xl:mb-1' />
-              <Skeleton className='h-6 w-[60px]' />
-            </div>
-            <div className='bg-border h-8 w-px shrink-0 sm:hidden xl:block'></div>
-            <div className='bg-border h-px w-full shrink-0 hidden sm:block xl:hidden'></div>
-            <div className='text-center w-full sm:min-w-0 sm:flex sm:items-center sm:justify-between xl:block xl:flex-1 xl:text-center'>
-              <Skeleton className='h-4 w-[40px] sm:mb-0 xl:mb-1' />
-              <Skeleton className='h-6 w-[60px]' />
+          <div className='space-y-3'>
+            <Skeleton className='h-7 w-[100px]' />
+            <Skeleton className='h-4 w-[60px]' />
+            <div className='grid grid-cols-3 gap-3 pt-1'>
+              <Skeleton className='h-4 w-[80px]' />
+              <Skeleton className='h-4 w-[80px]' />
+              <Skeleton className='h-4 w-[80px]' />
             </div>
           </div>
         </CardContent>
@@ -156,6 +156,8 @@ export function TokenStatsCard() {
   };
 
   const tokens = getTokens(timeRange);
+  const total = tokens.input + tokens.output;
+  const yiText = formatTokenToYi(total);
 
   return (
     <Card className='hover-card min-w-0'>
@@ -167,7 +169,6 @@ export function TokenStatsCard() {
           <CardTitle className='text-sm font-medium whitespace-normal leading-tight'>{t('dashboard.cards.tokenStats')}</CardTitle>
         </div>
         <div className='flex items-center gap-2 shrink-0'>
-          {/* <span className='text-xs text-muted-foreground'>{t('dashboard.stats.this')}</span> */}
           <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
             <TabsList className='h-6 p-0.5'>
               <TabsTrigger value='allTime' className='h-5 px-2 text-[10px]'>
@@ -194,22 +195,31 @@ export function TokenStatsCard() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className='flex items-end justify-between gap-2 sm:flex-col sm:gap-2 xl:flex-row xl:items-end xl:justify-between'>
-          <div className='text-center min-w-0 sm:flex sm:items-center sm:justify-between sm:w-full xl:block xl:text-center xl:flex-1'>
-            <div className='text-muted-foreground text-xs sm:mb-0 xl:mb-1'>{t('dashboard.stats.input')}</div>
-            <div className='font-mono text-lg font-bold'>{formatNumber(tokens.input)}</div>
+        <div className='space-y-2'>
+          {/* Total tokens - prominent, standalone line */}
+          <div>
+            <div className='flex items-baseline gap-2'>
+              <span className='font-mono text-xl font-bold'>{total.toLocaleString()}</span>
+              {yiText && (
+                <span className='text-muted-foreground text-sm'>{yiText}</span>
+              )}
+            </div>
+            <div className='text-muted-foreground text-xs'>{t('dashboard.stats.totalTokens')}</div>
           </div>
-          <div className='bg-border h-8 w-px shrink-0 sm:hidden xl:block'></div>
-          <div className='bg-border h-px w-full shrink-0 hidden sm:block xl:hidden'></div>
-          <div className='text-center min-w-0 sm:flex sm:items-center sm:justify-between sm:w-full xl:block xl:text-center xl:flex-1'>
-            <div className='text-muted-foreground text-xs sm:mb-0 xl:mb-1'>{t('dashboard.stats.output')}</div>
-            <div className='font-mono text-lg font-bold'>{formatNumber(tokens.output)}</div>
-          </div>
-          <div className='bg-border h-8 w-px shrink-0 sm:hidden xl:block'></div>
-          <div className='bg-border h-px w-full shrink-0 hidden sm:block xl:hidden'></div>
-          <div className='text-center min-w-0 sm:flex sm:items-center sm:justify-between sm:w-full xl:block xl:text-center xl:flex-1'>
-            <div className='text-muted-foreground text-xs sm:mb-0 xl:mb-1'>{t('dashboard.stats.cached')}</div>
-            <div className='text-muted-foreground font-mono text-lg font-bold'>{formatNumber(tokens.cached)}</div>
+          {/* Input, Output, Cached - same row, full numbers */}
+          <div className='grid grid-cols-3 gap-3 pt-1'>
+            <div>
+              <div className='font-mono text-base font-semibold'>{tokens.input.toLocaleString()}</div>
+              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.input')}</div>
+            </div>
+            <div>
+              <div className='font-mono text-base font-semibold'>{tokens.output.toLocaleString()}</div>
+              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.output')}</div>
+            </div>
+            <div>
+              <div className='text-muted-foreground font-mono text-base font-semibold'>{tokens.cached.toLocaleString()}</div>
+              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.cached')}</div>
+            </div>
           </div>
         </div>
       </CardContent>
