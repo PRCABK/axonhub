@@ -10,19 +10,19 @@ export function ChannelSuccessRate() {
 
   if (isLoading) {
     return (
-      <div className='@container'>
+      <div className="@container">
         <div
           tabIndex={0}
-          className='grid max-h-[322px] grid-cols-1 gap-x-6 gap-y-6 overflow-y-auto [scrollbar-gutter:stable] @md:grid-cols-2 @2xl:grid-cols-3'
+          className="grid max-h-[322px] grid-cols-1 gap-x-6 gap-y-6 overflow-y-auto [scrollbar-gutter:stable] @md:grid-cols-2 @2xl:grid-cols-3"
         >
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className='flex items-center'>
-              <Skeleton className='h-9 w-9 rounded-md' />
-              <div className='ml-4 space-y-1'>
-                <Skeleton className='h-4 w-[120px]' />
-                <Skeleton className='h-3 w-[160px]' />
+            <div key={i} className="flex items-center gap-3">
+              <Skeleton className="skeleton-shimmer h-9 w-9 rounded-lg" />
+              <div className="flex-1 space-y-1.5">
+                <Skeleton className="skeleton-shimmer h-4 w-[100px]" />
+                <Skeleton className="skeleton-shimmer h-3 w-[140px]" />
               </div>
-              <Skeleton className='ml-auto h-4 w-[60px]' />
+              <Skeleton className="skeleton-shimmer h-4 w-[50px]" />
             </div>
           ))}
         </div>
@@ -32,41 +32,55 @@ export function ChannelSuccessRate() {
 
   if (error) {
     return (
-      <div className='text-sm text-red-500'>
-        {t('dashboard.charts.errorLoadingChannelSuccessRate')} {error.message}
+      <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50/50 p-3 dark:border-red-800 dark:bg-red-950/30">
+        <XCircleIcon className="h-4 w-4 shrink-0 text-red-500" />
+        <span className="text-sm text-red-600 dark:text-red-400">
+          {t('dashboard.charts.errorLoadingChannelSuccessRate')} {error.message}
+        </span>
       </div>
     );
   }
 
   if (!channels || channels.length === 0) {
-    return <div className='text-muted-foreground text-sm'>{t('dashboard.charts.noChannelData')}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
+          <ActivityIcon className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground">{t('dashboard.charts.noChannelData')}</p>
+      </div>
+    );
   }
 
   return (
-    <div className='@container'>
+    <div className="@container">
       <div
         tabIndex={0}
-        className='grid max-h-[322px] grid-cols-1 gap-x-6 gap-y-6 overflow-y-auto [scrollbar-gutter:stable] @md:grid-cols-2 @2xl:grid-cols-3'
+        className="grid max-h-[322px] grid-cols-1 gap-x-6 gap-y-6 overflow-y-auto [scrollbar-gutter:stable] @md:grid-cols-2 @2xl:grid-cols-3"
       >
         {channels.map((channel) => (
-          <div key={channel.channelId} className='flex items-center'>
-            <div className='bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-md'>
-              <ActivityIcon className='text-primary h-5 w-5' />
+          <div key={channel.channelId} className="flex items-center gap-3 group">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 ring-1 ring-primary/10 transition-shadow group-hover:ring-primary/20">
+              <ActivityIcon className="h-4.5 w-4.5 text-primary" />
             </div>
-            <div className='ml-4 min-w-0 space-y-1'>
-              <p className='truncate text-sm leading-none font-medium'>{channel.channelName || '-'}</p>
-              <div className='text-muted-foreground flex gap-3 text-sm'>
-                <span className='flex items-center gap-1'>
-                  <CheckCircle2Icon className='h-3 w-3 text-green-500' />
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="truncate text-[13px] font-medium leading-none tracking-tight">
+                {channel.channelName || '-'}
+              </p>
+              <div className="flex gap-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <CheckCircle2Icon className="h-3 w-3 text-emerald-500" />
                   {formatNumber(channel.successCount)}
                 </span>
-                <span className='flex items-center gap-1'>
-                  <XCircleIcon className='h-3 w-3 text-red-500' />
+                <span className="inline-flex items-center gap-1">
+                  <XCircleIcon className="h-3 w-3 text-red-400" />
                   {formatNumber(channel.failedCount)}
                 </span>
               </div>
             </div>
-            <div className='ml-auto pl-2 font-medium'>{channel.successRate.toFixed(1)}%</div>
+            <div className="shrink-0 text-sm font-semibold tabular-nums tracking-tight">
+              {channel.successRate.toFixed(1)}%
+            </div>
           </div>
         ))}
       </div>

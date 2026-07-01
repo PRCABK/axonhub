@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useTranslation } from 'react-i18next';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, type TooltipProps } from 'recharts';
 import { Loader2 } from 'lucide-react';
@@ -28,8 +27,8 @@ export function TokensByModelChart({ timePeriod }: TokensByModelChartProps) {
 
   if (isLoading) {
     return (
-      <div className='flex h-[300px] items-center justify-center'>
-        <Skeleton className='h-[250px] w-full rounded-md' />
+      <div className="flex h-[300px] items-center justify-center">
+        <Skeleton className="skeleton-shimmer h-[250px] w-full rounded-xl" />
       </div>
     );
   }
@@ -78,24 +77,24 @@ export function TokensByModelChart({ timePeriod }: TokensByModelChartProps) {
     const percent = totalAllModels ? ((data.totalTokens ?? 0) / totalAllModels) * 100 : 0;
 
     return (
-      <div className='bg-background/90 rounded-md border px-3 py-2 text-xs shadow-sm backdrop-blur'>
-        <div className='text-foreground text-sm font-medium mb-1'>{data.name}</div>
-        <div className='space-y-1'>
-          <div className='flex justify-between gap-4'>
-            <span className='text-muted-foreground'>{t('dashboard.stats.inputTokens')}:</span>
-            <span className='font-medium'>{formatNumber(data.inputTokens)}</span>
+      <div className="chart-tooltip rounded-lg border px-3.5 py-3 text-xs shadow-sm">
+        <div className="mb-2 text-sm font-semibold tracking-tight">{data.name}</div>
+        <div className="space-y-1.5">
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">{t('dashboard.stats.inputTokens')}</span>
+            <span className="font-medium tabular-nums">{formatNumber(data.inputTokens)}</span>
           </div>
-          <div className='flex justify-between gap-4'>
-            <span className='text-muted-foreground'>{t('dashboard.stats.outputTokens')}:</span>
-            <span className='font-medium'>{formatNumber(data.outputTokens)}</span>
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">{t('dashboard.stats.outputTokens')}</span>
+            <span className="font-medium tabular-nums">{formatNumber(data.outputTokens)}</span>
           </div>
-          <div className='flex justify-between gap-4'>
-            <span className='text-muted-foreground'>{t('dashboard.stats.cachedTokens')}:</span>
-            <span className='font-medium'>{formatNumber(data.cachedTokens)}</span>
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">{t('dashboard.stats.cachedTokens')}</span>
+            <span className="font-medium tabular-nums">{formatNumber(data.cachedTokens)}</span>
           </div>
-          <div className='border-t pt-1 flex justify-between gap-4'>
-            <span className='text-foreground font-medium'>{t('dashboard.stats.totalTokens')}:</span>
-            <span className='font-semibold'>{formatNumber(data.totalTokens)} ({percent.toFixed(1)}%)</span>
+          <div className="flex justify-between gap-6 border-t border-border pt-1.5">
+            <span className="font-medium">{t('dashboard.stats.totalTokens')}</span>
+            <span className="font-semibold tabular-nums">{formatNumber(data.totalTokens)} ({percent.toFixed(1)}%)</span>
           </div>
         </div>
       </div>
@@ -103,56 +102,78 @@ export function TokensByModelChart({ timePeriod }: TokensByModelChartProps) {
   };
 
   return (
-    <div className='relative space-y-6'>
+    <div className="relative space-y-6">
       {hasError ? (
-        <div className='flex h-[300px] items-center justify-center'>
-          <div className='text-sm text-red-500'>
-            {t('dashboard.charts.errorLoadingTokenData')} {error.message}
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
+              <span className="text-sm font-bold text-red-500">!</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              {t('dashboard.charts.errorLoadingTokenData')} {error.message}
+            </span>
           </div>
         </div>
       ) : chartData.length === 0 ? (
-        <div className='flex h-[300px] items-center justify-center'>
-          <div className='text-muted-foreground text-sm'>{t('dashboard.charts.noTokenData')}</div>
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+              <span className="text-sm text-muted-foreground">—</span>
+            </div>
+            <span className="text-sm text-muted-foreground">{t('dashboard.charts.noTokenData')}</span>
+          </div>
         </div>
       ) : (
         <>
-          <ResponsiveContainer width='100%' height={320}>
+          <ResponsiveContainer width="100%" height={320}>
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray='3 3' stroke='var(--border)' vertical={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--border)"
+                strokeOpacity={0.4}
+                vertical={false}
+              />
               <XAxis
-                dataKey='name'
-                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                dataKey="name"
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 tickLine={false}
                 axisLine={false}
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={60}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={60}
-                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                width={55}
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 tickFormatter={(value) => formatNumber(value)}
               />
-              <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)' }} />
+              <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)', opacity: 0.3 }} />
               <Bar
-                dataKey='inputTokens'
+                dataKey="inputTokens"
                 fill={TOKEN_COLORS.input}
                 name={t('dashboard.stats.inputTokens')}
                 radius={[6, 6, 0, 0]}
-                isAnimationActive={false}
+                animationDuration={600}
+                animationEasing="ease-out"
               />
               <Bar
-                dataKey='outputTokens'
+                dataKey="outputTokens"
                 fill={TOKEN_COLORS.output}
                 name={t('dashboard.stats.outputTokens')}
                 radius={[6, 6, 0, 0]}
-                isAnimationActive={false}
+                animationDuration={600}
+                animationEasing="ease-out"
               />
               <Bar
-                dataKey='cachedTokens'
+                dataKey="cachedTokens"
                 fill={TOKEN_COLORS.cached}
                 name={t('dashboard.stats.cachedTokens')}
                 radius={[6, 6, 0, 0]}
-                isAnimationActive={false}
+                animationDuration={600}
+                animationEasing="ease-out"
               />
             </BarChart>
           </ResponsiveContainer>
@@ -161,8 +182,8 @@ export function TokensByModelChart({ timePeriod }: TokensByModelChartProps) {
         </>
       )}
       {isFetching && (
-        <div className='absolute inset-0 flex items-center justify-center bg-background/50'>
-          <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>

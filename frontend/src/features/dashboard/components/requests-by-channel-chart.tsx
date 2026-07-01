@@ -64,8 +64,8 @@ export function RequestsByChannelChart({ timePeriod }: RequestsByChannelChartPro
 
   if (isLoading) {
     return (
-      <div className='flex h-[300px] items-center justify-center'>
-        <Skeleton className='h-[250px] w-[250px] rounded-full' />
+      <div className="flex h-[300px] items-center justify-center">
+        <Skeleton className="skeleton-shimmer h-[250px] w-full rounded-xl" />
       </div>
     );
   }
@@ -103,16 +103,16 @@ export function RequestsByChannelChart({ timePeriod }: RequestsByChannelChartPro
     const costPercent = totalCost ? (data.cost / totalCost) * 100 : 0;
 
     return (
-      <div className='bg-background/90 rounded-md border px-3 py-2 text-xs shadow-sm backdrop-blur'>
-        <div className='text-foreground text-sm font-medium mb-1'>{data.name}</div>
-        <div className='space-y-1'>
-          <div className='flex justify-between gap-4'>
-            <span className='text-muted-foreground'>{t('dashboard.stats.requests')}:</span>
-            <span className='font-medium'>{formatNumber(data.requests)} ({reqPercent.toFixed(0)}%)</span>
+      <div className="chart-tooltip rounded-lg border px-3.5 py-3 text-xs shadow-sm">
+        <div className="mb-2 text-sm font-semibold tracking-tight">{data.name}</div>
+        <div className="space-y-1.5">
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">{t('dashboard.stats.requests')}</span>
+            <span className="font-medium tabular-nums">{formatNumber(data.requests)} ({reqPercent.toFixed(0)}%)</span>
           </div>
-          <div className='flex justify-between gap-4'>
-            <span className='text-muted-foreground'>{t('dashboard.stats.totalCost')}:</span>
-            <span className='font-medium'>{formatCurrency(data.cost, 4)} ({costPercent.toFixed(0)}%)</span>
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">{t('dashboard.stats.totalCost')}</span>
+            <span className="font-medium tabular-nums">{formatCurrency(data.cost, 4)} ({costPercent.toFixed(0)}%)</span>
           </div>
         </div>
       </div>
@@ -120,40 +120,84 @@ export function RequestsByChannelChart({ timePeriod }: RequestsByChannelChartPro
   };
 
   return (
-    <div className='relative space-y-6'>
+    <div className="relative space-y-6">
       {hasError ? (
-        <div className='flex h-[300px] items-center justify-center'>
-          <div className='text-sm text-red-500'>
-            {t('dashboard.charts.errorLoadingChannelData')} {error.message}
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
+              <span className="text-sm font-bold text-red-500">!</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              {t('dashboard.charts.errorLoadingChannelData')} {error.message}
+            </span>
           </div>
         </div>
       ) : chartData.length === 0 ? (
-        <div className='flex h-[300px] items-center justify-center'>
-          <div className='text-muted-foreground text-sm'>{t('dashboard.charts.noChannelData')}</div>
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+              <span className="text-sm text-muted-foreground">—</span>
+            </div>
+            <span className="text-sm text-muted-foreground">{t('dashboard.charts.noChannelData')}</span>
+          </div>
         </div>
       ) : (
         <>
-          <ResponsiveContainer width='100%' height={320}>
-            <BarChart data={chartData} barSize={32}>
-              <CartesianGrid strokeDasharray='3 3' stroke='var(--border)' vertical={false} />
-              <XAxis dataKey='name' hide />
-              <YAxis yAxisId='left' tickLine={false} axisLine={false} width={60} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
-              <YAxis
-                yAxisId='right'
-                orientation='right'
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={chartData} barSize={28}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--border)"
+                strokeOpacity={0.4}
+                vertical={false}
+              />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 tickLine={false}
                 axisLine={false}
-                width={70}
-                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis
+                yAxisId="left"
+                tickLine={false}
+                axisLine={false}
+                width={55}
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tickLine={false}
+                axisLine={false}
+                width={65}
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 tickFormatter={(value) => formatCurrency(value, 0)}
               />
-              <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)' }} />
-              <Bar yAxisId='left' dataKey='requests' radius={[6, 6, 0, 0]} isAnimationActive={false}>
+              <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)', opacity: 0.3 }} />
+              <Bar
+                yAxisId="left"
+                dataKey="requests"
+                radius={[6, 6, 0, 0]}
+                animationDuration={600}
+                animationEasing="ease-out"
+              >
                 {chartData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Bar>
-              <Bar yAxisId='right' dataKey='cost' radius={[6, 6, 0, 0]} fill='var(--chart-5)' opacity={0.5} isAnimationActive={false} />
+              <Bar
+                yAxisId="right"
+                dataKey="cost"
+                radius={[6, 6, 0, 0]}
+                fill="var(--chart-5)"
+                opacity={0.35}
+                animationDuration={600}
+                animationEasing="ease-out"
+              />
             </BarChart>
           </ResponsiveContainer>
 
@@ -162,8 +206,8 @@ export function RequestsByChannelChart({ timePeriod }: RequestsByChannelChartPro
       )}
 
       {isFetching && (
-        <div className='absolute inset-0 flex items-center justify-center bg-background/50'>
-          <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+        <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>

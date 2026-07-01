@@ -521,16 +521,180 @@
   --table-header: var(--muted);
 }
 
-/* Hover Card Effect */
+/* ===== REFINED DASHBOARD CARD STYLES ===== */
+
+/* Subtle card elevation — Google/Apple don't scale, they lift */
 .hover-card {
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  transition:
+    box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color 0.25s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border: 1px solid var(--border);
 }
 
 .hover-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: scale(1.02);
-  border-color: var(--primary);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.06);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
+  transform: translateY(-1px);
+}
+
+.dark .hover-card:hover {
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
+    0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--border));
+}
+
+/* Stat card with gradient accent bar */
+.stat-card-accent {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--chart-1), var(--chart-2), var(--chart-3));
+  border-radius: 3px 3px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card-accent:hover::before {
+  opacity: 1;
+}
+
+/* Glass-morphism card */
+.glass-card {
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.dark .glass-card {
+  background: color-mix(in srgb, var(--card) 50%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Dashboard section header — refined collapsible trigger */
+.dashboard-section-trigger {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.dashboard-section-trigger:hover {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 15%, var(--border));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.dark .dashboard-section-trigger:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Pulse dot — refined, subtle breathing */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.65 0.2 150);
+  box-shadow: 0 0 0 0 rgba(0, 200, 120, 0.5);
+  animation: pulse-dot-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-dot-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 120, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(0, 200, 120, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 120, 0);
+  }
+}
+
+/* Circular progress ring */
+.circular-progress {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Chart tooltip refinement */
+.chart-tooltip {
+  background: color-mix(in srgb, var(--popover) 92%, transparent) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+  font-size: 12px !important;
+}
+
+.dark .chart-tooltip {
+  background: color-mix(in srgb, var(--popover) 85%, transparent) !important;
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
+    0 8px 24px -4px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    color-mix(in srgb, var(--muted) 60%, var(--background)) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Subtle grid background for empty states */
+.dashboard-grid-bg {
+  background-image:
+    radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.5;
+}
+
+/* Smooth chart area fill animation */
+.recharts-area-curve {
+  transition: opacity 0.3s ease;
+}
+
+/* Legend item hover */
+.legend-item-hover {
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.legend-item-hover:hover {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
 }
 
 /* 表格行悬浮效果 */

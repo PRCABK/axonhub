@@ -154,7 +154,7 @@ func customizedDecodeHook(srcType reflect.Type, dstType reflect.Type, data any) 
 func setDefaults(v *viper.Viper) {
 	// Server defaults
 	v.SetDefault("server.host", "0.0.0.0")
-	v.SetDefault("server.port", 8090)
+	v.SetDefault("server.port", 8091)
 	v.SetDefault("server.public_url", "")
 	v.SetDefault("server.name", "AxonHub")
 	v.SetDefault("server.base_path", "")
@@ -178,7 +178,7 @@ func setDefaults(v *viper.Viper) {
 	// CORS defaults
 	v.SetDefault("server.cors.enabled", false)
 	v.SetDefault("server.cors.debug", false)
-	v.SetDefault("server.cors.allowed_origins", []string{"http://localhost:8090"})
+	v.SetDefault("server.cors.allowed_origins", []string{"http://localhost:8091"})
 	v.SetDefault("server.cors.allowed_methods", []string{"GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS", "HEAD"})
 	v.SetDefault("server.cors.allowed_headers", []string{"Content-Type", "Authorization", "X-API-Key", "X-Goog-Api-Key", "X-Project-ID", "X-Thread-ID", "X-Trace-ID"})
 	v.SetDefault("server.cors.exposed_headers", []string{})

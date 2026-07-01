@@ -22,27 +22,39 @@ export function ChartLegend({ items, columns, showIndex = true }: ChartLegendPro
 
   return (
     <div
-      className={cn('grid gap-x-4 gap-y-4')}
+      className={cn('grid gap-x-5 gap-y-3')}
       style={{
         gridTemplateRows: effectiveColumns === 2 ? `repeat(${rows}, auto)` : undefined,
         gridAutoFlow: effectiveColumns === 2 ? 'column' : undefined,
       }}
     >
       {items.map((item, index) => (
-        <div key={`${item.name}-${index}`} className='grid w-full grid-cols-[auto_auto_1fr_auto] items-start gap-3'>
+        <div
+          key={`${item.name}-${index}`}
+          className="legend-item-hover grid w-full cursor-default grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-lg border border-transparent px-2 py-1.5 -mx-2"
+        >
           {showIndex && item.index !== undefined && (
-            <span className='text-muted-foreground w-8 text-right text-sm font-semibold tabular-nums'>
-              {item.index.toString().padStart(2, '0')}.
+            <span className="w-7 text-right text-[11px] font-semibold tabular-nums text-muted-foreground/60">
+              {item.index.toString().padStart(2, '0')}
             </span>
           )}
           {item.color && (
-            <span className='mt-1 h-2.5 w-2.5 rounded-full' style={{ backgroundColor: item.color }} />
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/5 dark:ring-white/10"
+              style={{ backgroundColor: item.color }}
+            />
           )}
-          <span className='text-foreground min-w-0 text-sm font-medium break-words'>{item.name}</span>
-          <div className='text-right leading-tight'>
-            <div className='text-foreground text-sm font-medium tabular-nums'>{item.primaryValue}</div>
+          <span className="min-w-0 truncate text-[13px] font-medium tracking-tight">
+            {item.name}
+          </span>
+          <div className="shrink-0 text-right leading-tight">
+            <div className="text-[13px] font-semibold tabular-nums tracking-tight">
+              {item.primaryValue}
+            </div>
             {item.secondaryValue && (
-              <div className='text-muted-foreground text-xs tabular-nums'>{item.secondaryValue}</div>
+              <div className="text-[11px] tabular-nums text-muted-foreground/70">
+                {item.secondaryValue}
+              </div>
             )}
           </div>
         </div>

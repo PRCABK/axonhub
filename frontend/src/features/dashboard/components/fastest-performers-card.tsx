@@ -12,7 +12,6 @@ import { TimePeriodSelector, type FastestTimeWindow } from '@/components/time-pe
 import { safeNumber, safeToFixed, sanitizeChartData, type ChartData } from '../utils/chart-helpers';
 import { ChartLegend, type ChartLegendItem } from './chart-legend';
 
-// 5 colors matches the slice limit in chartData processing (.slice(0, 5))
 const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 interface HorizontalBarChartProps {
@@ -22,14 +21,19 @@ interface HorizontalBarChartProps {
   noDataLabel: string;
 }
 
-function HorizontalBarChart({ data, total, height = 280, noDataLabel }: HorizontalBarChartProps) {
+function HorizontalBarChart({ data, total, height = 260, noDataLabel }: HorizontalBarChartProps) {
   const safeData = sanitizeChartData(data);
   const safeTotal = safeNumber(total);
 
   if (safeData.length === 0) {
     return (
-      <div className='flex h-[250px] items-center justify-center text-muted-foreground text-sm'>
-        {noDataLabel}
+      <div className="flex h-[250px] items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted">
+            <span className="text-sm text-muted-foreground">—</span>
+          </div>
+          <span className="text-sm text-muted-foreground">{noDataLabel}</span>
+        </div>
       </div>
     );
   }
@@ -43,33 +47,44 @@ function HorizontalBarChart({ data, total, height = 280, noDataLabel }: Horizont
     const percent = safeTotal > 0 ? (safeThroughput / safeTotal) * 100 : 0;
 
     return (
-      <div className='bg-background/90 rounded-md border px-3 py-2 text-xs shadow-sm backdrop-blur'>
-        <div className='text-foreground text-sm font-medium'>{item.name}</div>
-        <div className='text-muted-foreground'>
-          {safeToFixed(safeThroughput, 0)} tokens/s ({safeToFixed(percent, 0)}%)
-        </div>
-        <div className='text-muted-foreground text-xs'>
-          {safeNumber(item.requestCount)} requests
+      <div className="chart-tooltip rounded-lg border px-3 py-2.5 text-xs shadow-sm">
+        <div className="mb-1 text-sm font-semibold tracking-tight">{item.name}</div>
+        <div className="space-y-1">
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">Throughput</span>
+            <span className="font-medium tabular-nums">{safeToFixed(safeThroughput, 0)} tok/s</span>
+          </div>
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">Share</span>
+            <span className="font-medium tabular-nums">{safeToFixed(percent, 0)}%</span>
+          </div>
+          <div className="flex justify-between gap-6">
+            <span className="text-muted-foreground">Requests</span>
+            <span className="font-medium tabular-nums">{formatNumber(safeNumber(item.requestCount))}</span>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <ResponsiveContainer width='100%' height={height}>
-      <BarChart data={safeData} layout='vertical' barSize={32} margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
-        <CartesianGrid strokeDasharray='3 3' stroke='var(--border)' horizontal={false} />
-        <XAxis type='number' hide />
-        <YAxis
-          type='category'
-          dataKey='name'
-          width={10}
-          tick={false}
-          tickLine={false}
-          axisLine={false}
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={safeData}
+        layout="vertical"
+        barSize={28}
+        margin={{ left: 10, right: 10, top: 5, bottom: 5 }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--border)"
+          strokeOpacity={0.4}
+          horizontal={false}
         />
-        <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)' }} />
-        <Bar dataKey='throughput' radius={[0, 4, 4, 0]}>
+        <XAxis type="number" hide />
+        <YAxis type="category" dataKey="name" width={10} tick={false} tickLine={false} axisLine={false} />
+        <Tooltip content={tooltipContent} cursor={{ fill: 'var(--muted)', opacity: 0.3 }} />
+        <Bar dataKey="throughput" radius={[0, 6, 6, 0]} animationDuration={600} animationEasing="ease-out">
           {safeData.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
@@ -106,14 +121,14 @@ export function FastestPerformersCard<T extends ThroughputData>({
 
   if (isLoading && !items) {
     return (
-      <Card className='hover-card'>
+      <Card className="hover-card h-full">
         <CardHeader>
-          <Skeleton className='h-5 w-[180px]' />
-          <Skeleton className='h-4 w-[120px]' />
+          <Skeleton className="skeleton-shimmer h-5 w-[180px]" />
+          <Skeleton className="skeleton-shimmer h-4 w-[120px]" />
         </CardHeader>
         <CardContent>
-          <div className='flex h-[250px] items-center justify-center'>
-            <Skeleton className='h-[200px] w-full' />
+          <div className="flex h-[250px] items-center justify-center">
+            <Skeleton className="skeleton-shimmer h-[200px] w-full rounded-xl" />
           </div>
         </CardContent>
       </Card>
@@ -122,12 +137,13 @@ export function FastestPerformersCard<T extends ThroughputData>({
 
   if (error) {
     return (
-      <Card className='hover-card'>
+      <Card className="hover-card h-full">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight">{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='text-sm text-red-500'>
+          <div className="flex items-center gap-2 text-sm text-red-500">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500" />
             {t('common.loadError')}: {error.message}
           </div>
         </CardContent>
@@ -157,22 +173,22 @@ export function FastestPerformersCard<T extends ThroughputData>({
   }));
 
   return (
-    <Card className='hover-card h-full'>
-      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-        <div className='space-y-1'>
-          <CardTitle className='text-base font-medium'>{title}</CardTitle>
+    <Card className="hover-card h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="space-y-1">
+          <CardTitle className="text-base font-semibold tracking-tight">{title}</CardTitle>
           <CardDescription>{description(totalRequests)}</CardDescription>
         </div>
         <TimePeriodSelector value={timeWindow} onChange={setTimeWindow} periods={['month', 'week', 'day']} />
       </CardHeader>
-      <CardContent className='relative'>
-        <div className='space-y-4'>
+      <CardContent className="relative">
+        <div className="space-y-4">
           <HorizontalBarChart data={chartData} total={total} noDataLabel={noDataLabel} />
           <ChartLegend items={legendItems} columns={1} />
         </div>
         {isFetching && (
-          <div className='absolute inset-0 flex items-center justify-center bg-background/50'>
-            <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-sm">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         )}
       </CardContent>

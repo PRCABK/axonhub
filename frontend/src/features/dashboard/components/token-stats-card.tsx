@@ -39,12 +39,12 @@ function LastUpdatedInfo({ lastUpdated, locale, t }: LastUpdatedInfoProps) {
 
   return (
     <>
-      <div className='hidden sm:block w-6 h-6'>
+      <div className="hidden sm:block">
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className='text-muted-foreground hover:text-foreground transition-colors w-6 h-6 flex items-center justify-center'>
-                <IconInfoCircle className='h-4 w-4' />
+              <button className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <IconInfoCircle className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -53,15 +53,15 @@ function LastUpdatedInfo({ lastUpdated, locale, t }: LastUpdatedInfoProps) {
           </Tooltip>
         </TooltipProvider>
       </div>
-      <div className='sm:hidden w-11 h-11'>
+      <div className="sm:hidden">
         <Popover>
           <PopoverTrigger asChild>
-            <button className='text-muted-foreground hover:text-foreground transition-colors w-11 h-11 flex items-center justify-center'>
-              <IconInfoCircle className='h-5 w-5' />
+            <button className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <IconInfoCircle className="h-5 w-5" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className='w-fit'>
-            <span className='text-sm'>{label}</span>
+          <PopoverContent className="w-fit">
+            <span className="text-sm">{label}</span>
           </PopoverContent>
         </Popover>
       </div>
@@ -78,6 +78,28 @@ function formatTokenToYi(value: number): string {
   return '';
 }
 
+/**
+ * KPI label — small, muted, uppercase for that Apple/Stripe look
+ */
+function KpiLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+      {children}
+    </span>
+  );
+}
+
+/**
+ * KPI value — prominent, tabular-nums, tight tracking
+ */
+function KpiValue({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className={`text-sm font-semibold tabular-nums tracking-tight ${className}`}>
+      {children}
+    </span>
+  );
+}
+
 export function TokenStatsCard() {
   const { t, i18n } = useTranslation();
   const { data: stats, isLoading, error } = useTokenStats();
@@ -85,19 +107,19 @@ export function TokenStatsCard() {
 
   if (isLoading) {
     return (
-      <Card className='min-w-0'>
-        <CardHeader className='flex flex-wrap items-start sm:items-center justify-between gap-2 pb-2'>
-          <Skeleton className='h-5 w-[120px]' />
-          <Skeleton className='h-5 w-[200px]' />
+      <Card className="min-w-0">
+        <CardHeader className="flex flex-wrap items-start sm:items-center justify-between gap-2 pb-2">
+          <Skeleton className="skeleton-shimmer h-5 w-[120px]" />
+          <Skeleton className="skeleton-shimmer h-5 w-[200px]" />
         </CardHeader>
         <CardContent>
-          <div className='space-y-3'>
-            <Skeleton className='h-7 w-[100px]' />
-            <Skeleton className='h-4 w-[60px]' />
-            <div className='grid grid-cols-3 gap-3 pt-1'>
-              <Skeleton className='h-4 w-[80px]' />
-              <Skeleton className='h-4 w-[80px]' />
-              <Skeleton className='h-4 w-[80px]' />
+          <div className="space-y-3">
+            <Skeleton className="skeleton-shimmer h-8 w-[120px]" />
+            <Skeleton className="skeleton-shimmer h-3 w-[60px]" />
+            <div className="grid grid-cols-3 gap-4 pt-1">
+              <Skeleton className="skeleton-shimmer h-5 w-[80px]" />
+              <Skeleton className="skeleton-shimmer h-5 w-[80px]" />
+              <Skeleton className="skeleton-shimmer h-5 w-[80px]" />
             </div>
           </div>
         </CardContent>
@@ -107,20 +129,19 @@ export function TokenStatsCard() {
 
   if (error) {
     return (
-      <Card className='hover-card min-w-0'>
-        <CardHeader className='flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2'>
-          <div className='flex items-center gap-2 min-w-0'>
-            <div className='bg-primary/10 text-primary dark:bg-primary/20 rounded-lg p-1.5 shrink-0'>
-              <BarChart4 className='h-4 w-4' />
+      <Card className="hover-card min-w-0">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/15 to-blue-500/10 ring-1 ring-violet-500/10 shrink-0">
+              <BarChart4 className="h-4 w-4 text-violet-500" />
             </div>
-            <CardTitle className='text-sm font-medium truncate'>{t('dashboard.cards.tokenStats')}</CardTitle>
-          </div>
-          <div className='flex items-center gap-1 shrink-0'>
-            <span className='bg-primary/10 text-primary dark:bg-primary/20 rounded-md px-2 py-1 text-xs'>{t('dashboard.stats.month')}</span>
+            <CardTitle className="text-sm font-semibold tracking-tight truncate">
+              {t('dashboard.cards.tokenStats')}
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <div className='text-sm text-red-500'>{t('common.loadError')}</div>
+          <div className="text-sm text-red-500">{t('common.loadError')}</div>
         </CardContent>
       </Card>
     );
@@ -160,27 +181,29 @@ export function TokenStatsCard() {
   const yiText = formatTokenToYi(total);
 
   return (
-    <Card className='hover-card min-w-0'>
-      <CardHeader className='flex flex-wrap items-start sm:items-center justify-between gap-2 pb-2'>
-        <div className='flex items-center gap-2'>
-          <div className='bg-primary/10 text-primary dark:bg-primary/20 rounded-lg p-1.5 shrink-0'>
-            <BarChart4 className='h-4 w-4' />
+    <Card className="hover-card min-w-0">
+      <CardHeader className="flex flex-wrap items-start sm:items-center justify-between gap-2 pb-2">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/15 to-blue-500/10 ring-1 ring-violet-500/10 shrink-0">
+            <BarChart4 className="h-4 w-4 text-violet-500" />
           </div>
-          <CardTitle className='text-sm font-medium whitespace-normal leading-tight'>{t('dashboard.cards.tokenStats')}</CardTitle>
+          <CardTitle className="text-sm font-semibold tracking-tight">
+            {t('dashboard.cards.tokenStats')}
+          </CardTitle>
         </div>
-        <div className='flex items-center gap-2 shrink-0'>
+        <div className="flex items-center gap-2 shrink-0">
           <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
-            <TabsList className='h-6 p-0.5'>
-              <TabsTrigger value='allTime' className='h-5 px-2 text-[10px]'>
+            <TabsList className="h-7 p-0.5 rounded-lg bg-muted/60">
+              <TabsTrigger value="allTime" className="h-6 px-2.5 text-[11px] rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 {t('dashboard.stats.all')}
               </TabsTrigger>
-              <TabsTrigger value='thisMonth' className='h-5 px-2 text-[10px]'>
+              <TabsTrigger value="thisMonth" className="h-6 px-2.5 text-[11px] rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 {t('dashboard.stats.month')}
               </TabsTrigger>
-              <TabsTrigger value='thisWeek' className='h-5 px-2 text-[10px]'>
+              <TabsTrigger value="thisWeek" className="h-6 px-2.5 text-[11px] rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 {t('dashboard.stats.week')}
               </TabsTrigger>
-              <TabsTrigger value='thisDay' className='h-5 px-2 text-[10px]'>
+              <TabsTrigger value="thisDay" className="h-6 px-2.5 text-[11px] rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 {t('dashboard.stats.day')}
               </TabsTrigger>
             </TabsList>
@@ -195,30 +218,33 @@ export function TokenStatsCard() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className='space-y-2'>
-          {/* Total tokens - prominent, standalone line */}
+        <div className="space-y-3">
+          {/* Hero number */}
           <div>
-            <div className='flex items-baseline gap-2'>
-              <span className='font-mono text-xl font-bold'>{total.toLocaleString()}</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
+                {total.toLocaleString()}
+              </span>
               {yiText && (
-                <span className='text-muted-foreground text-sm'>{yiText}</span>
+                <span className="text-sm font-medium text-muted-foreground">{yiText}</span>
               )}
             </div>
-            <div className='text-muted-foreground text-xs'>{t('dashboard.stats.totalTokens')}</div>
+            <KpiLabel>{t('dashboard.stats.totalTokens')}</KpiLabel>
           </div>
-          {/* Input, Output, Cached - same row, full numbers */}
-          <div className='grid grid-cols-3 gap-3 pt-1'>
-            <div>
-              <div className='font-mono text-base font-semibold'>{tokens.input.toLocaleString()}</div>
-              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.input')}</div>
+
+          {/* Sub-metrics */}
+          <div className="grid grid-cols-3 gap-4 pt-2 border-t border-border/40">
+            <div className="space-y-0.5">
+              <KpiValue>{tokens.input.toLocaleString()}</KpiValue>
+              <KpiLabel>{t('dashboard.stats.input')}</KpiLabel>
             </div>
-            <div>
-              <div className='font-mono text-base font-semibold'>{tokens.output.toLocaleString()}</div>
-              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.output')}</div>
+            <div className="space-y-0.5">
+              <KpiValue>{tokens.output.toLocaleString()}</KpiValue>
+              <KpiLabel>{t('dashboard.stats.output')}</KpiLabel>
             </div>
-            <div>
-              <div className='text-muted-foreground font-mono text-base font-semibold'>{tokens.cached.toLocaleString()}</div>
-              <div className='text-muted-foreground text-xs'>{t('dashboard.stats.cached')}</div>
+            <div className="space-y-0.5">
+              <KpiValue className="text-muted-foreground">{tokens.cached.toLocaleString()}</KpiValue>
+              <KpiLabel>{t('dashboard.stats.cached')}</KpiLabel>
             </div>
           </div>
         </div>

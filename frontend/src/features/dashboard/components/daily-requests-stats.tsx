@@ -31,12 +31,15 @@ export function DailyRequestStats() {
     [currencyCode, locale, t]
   );
 
-  const formatCostTick = useCallback((value: number | string) => formatCurrency(Number(value), 0), [formatCurrency]);
+  const formatCostTick = useCallback(
+    (value: number | string) => formatCurrency(Number(value), 0),
+    [formatCurrency]
+  );
 
   const tooltipFormatter = useCallback(
     (value: number | string, name: string) => {
       if (name === t('dashboard.stats.totalCost')) {
-        return [formatCurrency(Number(value), 0), name];
+        return [formatCurrency(Number(value), 2), name];
       }
       return [formatNumber(Number(value)), name];
     },
@@ -45,24 +48,29 @@ export function DailyRequestStats() {
 
   if (isLoading) {
     return (
-      <div className='flex h-[350px] items-center justify-center'>
-        <Skeleton className='h-full w-full' />
+      <div className="flex h-[350px] items-center justify-center">
+        <Skeleton className="skeleton-shimmer h-full w-full rounded-xl" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='flex h-[350px] items-center justify-center text-red-500'>
-        {t('dashboard.charts.errorLoadingChart')} {error.message}
+      <div className="flex h-[350px] items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/30">
+            <span className="text-lg">!</span>
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {t('dashboard.charts.errorLoadingChart')} {error.message}
+          </span>
+        </div>
       </div>
     );
   }
 
-  // Transform data for the chart
   const chartData =
     dailyStats?.map((stat) => {
-      // Parse YYYY-MM-DD as local date to avoid UTC interpretation
       const [year, month, day] = stat.date.split('-').map(Number);
       const date = new Date(year, month - 1, day);
       return {
@@ -77,7 +85,6 @@ export function DailyRequestStats() {
       };
     }) || [];
 
-  // Calculate max values for Y-axis domains
   const maxRequests = Math.max(...chartData.map((d) => d.requests), 0);
   const maxTokens = Math.max(...chartData.map((d) => d.tokens), 0);
   const maxCost = Math.max(...chartData.map((d) => d.cost), 0);
@@ -87,62 +94,70 @@ export function DailyRequestStats() {
   const costMax = Math.max(0.1, maxCost * 1.1);
 
   return (
-    <ResponsiveContainer width='100%' height={350}>
+    <ResponsiveContainer width="100%" height={350}>
       <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
         <defs>
-          <linearGradient id='colorRequests' x1='0' y1='0' x2='0' y2='1'>
-            <stop offset='5%' stopColor='var(--primary)' stopOpacity={0.3} />
-            <stop offset='95%' stopColor='var(--primary)' stopOpacity={0} />
+          <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
           </linearGradient>
-          <linearGradient id='colorTokens' x1='0' y1='0' x2='0' y2='1'>
-            <stop offset='5%' stopColor='var(--chart-2)' stopOpacity={0.2} />
-            <stop offset='95%' stopColor='var(--chart-2)' stopOpacity={0} />
+          <linearGradient id="colorTokens" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
           </linearGradient>
-          <linearGradient id='colorCost' x1='0' y1='0' x2='0' y2='1'>
-            <stop offset='5%' stopColor='var(--chart-3)' stopOpacity={0.4} />
-            <stop offset='95%' stopColor='var(--chart-3)' stopOpacity={0} />
+          <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray='3 3' stroke='var(--border)' vertical={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--border)"
+          strokeOpacity={0.5}
+          vertical={false}
+        />
         <XAxis
-          dataKey='name'
-          stroke='var(--muted-foreground)'
-          fontSize={12}
-          tickLine={true}
-          axisLine={true}
+          dataKey="name"
+          stroke="var(--muted-foreground)"
+          strokeOpacity={0.5}
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
           padding={{ right: 24 }}
-        // padding={{ left: 16, right: 16 }}
         />
         <YAxis
-          yAxisId='left'
-          stroke='var(--chart-1)'
-          fontSize={12}
-          tickLine={true}
-          axisLine={true}
+          yAxisId="left"
+          stroke="var(--chart-1)"
+          strokeOpacity={0.6}
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
           domain={[0, requestsMax]}
           tickFormatter={(value) => formatNumber(value)}
           width={40}
           tickMargin={8}
         />
         <YAxis
-          yAxisId='tokens'
-          orientation='right'
-          stroke='var(--chart-2)'
-          fontSize={12}
-          tickLine={true}
-          axisLine={true}
+          yAxisId="tokens"
+          orientation="right"
+          stroke="var(--chart-2)"
+          strokeOpacity={0.6}
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
           domain={[0, tokensMax]}
           tickFormatter={(value) => formatNumber(value)}
           width={40}
           tickMargin={8}
         />
         <YAxis
-          yAxisId='cost'
-          orientation='right'
-          stroke='var(--chart-3)'
-          fontSize={12}
-          tickLine={true}
-          axisLine={true}
+          yAxisId="cost"
+          orientation="right"
+          stroke="var(--chart-3)"
+          strokeOpacity={0.6}
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
           domain={[0, costMax]}
           tickFormatter={formatCostTick}
           width={60}
@@ -151,49 +166,61 @@ export function DailyRequestStats() {
         <Tooltip
           formatter={tooltipFormatter}
           contentStyle={{
-            backgroundColor: 'var(--background)',
-            borderColor: 'var(--border)',
-            borderRadius: 'var(--radius)',
+            backgroundColor: 'var(--popover)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-md)',
             fontSize: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
           }}
-          itemStyle={{ padding: '2px 0' }}
+          itemStyle={{ padding: '3px 0' }}
         />
-        <Legend verticalAlign='top' height={36} />
+        <Legend
+          verticalAlign="top"
+          height={36}
+          iconType="circle"
+          iconSize={8}
+        />
         <Area
-          yAxisId='left'
-          type='monotone'
-          dataKey='requests'
+          yAxisId="left"
+          type="monotone"
+          dataKey="requests"
           name={t('dashboard.stats.requests')}
-          stroke='var(--chart-1)'
+          stroke="var(--chart-1)"
           strokeWidth={2}
           fillOpacity={1}
-          fill='url(#colorRequests)'
+          fill="url(#colorRequests)"
           dot={false}
-          activeDot={{ r: 5 }}
+          activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--background)' }}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
         <Area
-          yAxisId='tokens'
-          type='monotone'
-          dataKey='tokens'
+          yAxisId="tokens"
+          type="monotone"
+          dataKey="tokens"
           name={t('dashboard.stats.totalTokens')}
-          stroke='var(--chart-2)'
+          stroke="var(--chart-2)"
           strokeWidth={2}
           fillOpacity={1}
-          fill='url(#colorTokens)'
+          fill="url(#colorTokens)"
           dot={false}
-          activeDot={{ r: 4 }}
+          activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--background)' }}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
         <Area
-          yAxisId='cost'
-          type='monotone'
-          dataKey='cost'
+          yAxisId="cost"
+          type="monotone"
+          dataKey="cost"
           name={t('dashboard.stats.totalCost')}
-          stroke='var(--chart-3)'
+          stroke="var(--chart-3)"
           strokeWidth={2}
           fillOpacity={1}
-          fill='url(#colorCost)'
+          fill="url(#colorCost)"
           dot={false}
-          activeDot={{ r: 4 }}
+          activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--background)' }}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
       </AreaChart>
     </ResponsiveContainer>
